@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>認識尖石國小互動導覽</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .perspective-1000 { perspective: 1000px; }
+        .transform-style-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+        
+        /* Smooth transitions */
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-emerald-800 text-white p-6 shadow-xl relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-emerald-700 rounded-full -mr-20 -mt-20 opacity-20"></div>
+        <div class="max-w-4xl mx-auto flex justify-between items-center relative z-10">
+            <div>
+                <h1 class="text-3xl font-bold tracking-tight">尖石國小互動導覽</h1>
+                <p class="text-emerald-100 flex items-center mt-2 font-medium">
+                    <i data-lucide="map-pin" class="w-4 h-4 mr-2"></i> 新竹縣尖石鄉嘉樂村2鄰60號
+                </p>
+            </div>
+            <div class="hidden md:block">
+                <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20">
+                    <p class="text-xs uppercase tracking-widest text-emerald-200">泰雅語問候</p>
+                    <p class="text-xl font-bold">Lokah Su!</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="bg-white border-b sticky top-0 z-20 shadow-sm">
+        <div class="max-w-4xl mx-auto flex">
+            <button onclick="showSection('home')" id="tab-home" class="tab-btn flex-1 py-4 flex items-center justify-center gap-2 border-b-4 border-emerald-600 text-emerald-700 bg-emerald-50/50 font-bold transition-all">
+                <i data-lucide="info" class="w-4 h-4"></i> 認識校園
+            </button>
+            <button onclick="showSection('culture')" id="tab-culture" class="tab-btn flex-1 py-4 flex items-center justify-center gap-2 border-b-4 border-transparent text-slate-400 hover:text-emerald-500 hover:bg-slate-50 transition-all">
+                <i data-lucide="languages" class="w-4 h-4"></i> 文化與語言
+            </button>
+            <button onclick="showSection('quiz')" id="tab-quiz" class="tab-btn flex-1 py-4 flex items-center justify-center gap-2 border-b-4 border-transparent text-slate-400 hover:text-emerald-500 hover:bg-slate-50 transition-all">
+                <i data-lucide="award" class="w-4 h-4"></i> 知識挑戰
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto p-4 md:p-8">
+
+        <!-- Section: Home -->
+        <div id="section-home" class="content-section space-y-8 fade-in">
+            <section class="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 relative overflow-hidden">
+                <h2 class="text-2xl font-bold mb-6 flex items-center">
+                    <span class="w-1.5 h-7 bg-emerald-600 rounded-full mr-3"></span>
+                    互動式校園地標
+                </h2>
+                <p class="text-slate-500 mb-8">點擊下方地標圖示，探索尖石國小的特色角落：</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <button onclick="selectPOI('archery')" class="poi-btn p-6 rounded-2xl border-2 border-slate-100 bg-slate-50 hover:border-emerald-200 transition-all flex flex-col items-center gap-4">
+                        <div class="p-4 bg-white rounded-full shadow-sm text-red-500"><i data-lucide="target"></i></div>
+                        <span class="font-bold">傳統射箭場</span>
+                    </button>
+                    <button onclick="selectPOI('river')" class="poi-btn p-6 rounded-2xl border-2 border-slate-100 bg-slate-50 hover:border-emerald-200 transition-all flex flex-col items-center gap-4">
+                        <div class="p-4 bg-white rounded-full shadow-sm text-blue-500"><i data-lucide="compass"></i></div>
+                        <span class="font-bold">油羅溪畔</span>
+                    </button>
+                    <button onclick="selectPOI('wall')" class="poi-btn p-6 rounded-2xl border-2 border-slate-100 bg-slate-50 hover:border-emerald-200 transition-all flex flex-col items-center gap-4">
+                        <div class="p-4 bg-white rounded-full shadow-sm text-orange-500"><i data-lucide="info"></i></div>
+                        <span class="font-bold">泰雅文化牆</span>
+                    </button>
+                </div>
+
+                <div id="poi-detail" class="hidden bg-emerald-900 text-white p-6 rounded-2xl animate-in slide-in-from-bottom-4">
+                    <h4 id="poi-title" class="font-bold text-lg mb-2 flex items-center gap-2"></h4>
+                    <p id="poi-desc" class="text-emerald-100 leading-relaxed"></p>
+                </div>
+            </section>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-lg transition-all group">
+                    <div class="mb-4 p-3 bg-slate-50 rounded-xl w-fit text-orange-500"><i data-lucide="users"></i></div>
+                    <h3 class="font-bold text-xl mb-2">文化傳承</h3>
+                    <p class="text-slate-500 leading-relaxed">致力於泰雅族語教學與傳統工藝（如織布、狩獵文化）。</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-lg transition-all group">
+                    <div class="mb-4 p-3 bg-slate-50 rounded-xl w-fit text-blue-500"><i data-lucide="music"></i></div>
+                    <h3 class="font-bold text-xl mb-2">合唱團</h3>
+                    <p class="text-slate-500 leading-relaxed">以清澈嘹亮的泰雅古調聞名，經常受邀各地演出。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: Culture -->
+        <div id="section-culture" class="content-section hidden space-y-8 fade-in">
+            <section class="bg-orange-50 rounded-3xl p-8 border border-orange-100">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                    <div>
+                        <h2 class="text-2xl font-bold text-orange-900">泰雅語輕鬆學</h2>
+                        <p class="text-orange-700">點擊卡片翻面，學習基本的泰雅族問候語！</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="changeFlashcard(-1)" class="p-2 bg-white rounded-full border border-orange-200 hover:bg-orange-100 transition-colors">
+                            <i data-lucide="chevron-left"></i>
+                        </button>
+                        <button onclick="changeFlashcard(1)" class="p-2 bg-white rounded-full border border-orange-200 hover:bg-orange-100 transition-colors">
+                            <i data-lucide="chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex justify-center">
+                    <div class="w-full max-w-sm h-64 perspective-1000 cursor-pointer" onclick="toggleFlashcard()">
+                        <div id="flashcard-inner" class="relative w-full h-full transition-all duration-500 transform-style-3d">
+                            <!-- Front -->
+                            <div class="absolute w-full h-full bg-white rounded-3xl shadow-xl border-4 border-orange-200 flex flex-col items-center justify-center p-8 backface-hidden">
+                                <span class="text-sm text-orange-400 font-bold mb-4 uppercase tracking-widest">泰雅語 Atayal</span>
+                                <h3 id="card-atayal" class="text-4xl font-black text-orange-600">Lokah su?</h3>
+                                <p class="mt-4 text-orange-300 italic flex items-center gap-1">
+                                    <i data-lucide="heart" class="w-3 h-3"></i> 點擊翻開中文含意
+                                </p>
+                            </div>
+                            <!-- Back -->
+                            <div class="absolute w-full h-full bg-orange-600 text-white rounded-3xl shadow-xl flex flex-col items-center justify-center p-8 backface-hidden rotate-y-180">
+                                <h3 id="card-chinese" class="text-3xl font-bold mb-2">你好嗎？</h3>
+                                <p id="card-phonetic" class="text-orange-100 text-lg">讀音：羅卡 蘇</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+                   <h3 class="text-xl font-bold mb-4 flex items-center gap-2 text-indigo-500">
+                     <i data-lucide="book-open"></i> 傳統射箭傳承
+                   </h3>
+                   <p class="text-slate-600 leading-relaxed">尖石國小的射箭隊在全國賽事中屢獲佳績，透過射箭，孩子們學習不僅是技巧，更是對目標的專注與祖先獵人精神的致敬。</p>
+                </div>
+                <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+                   <h3 class="text-xl font-bold mb-4 flex items-center gap-2 text-rose-500">
+                     <i data-lucide="music"></i> 泰雅複音合唱
+                   </h3>
+                   <p class="text-slate-600 leading-relaxed">複音唱法是泰雅音樂的珍寶。學生們透過練習古調，將快要遺忘的語言節奏重新注入生命。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: Quiz -->
+        <div id="section-quiz" class="content-section hidden max-w-2xl mx-auto fade-in">
+            <div id="quiz-container" class="bg-white rounded-3xl p-8 shadow-2xl border border-slate-100">
+                <div class="flex justify-between items-center mb-10">
+                    <div class="space-y-1">
+                        <span class="text-emerald-600 font-bold text-xs uppercase tracking-tighter">知識挑戰賽</span>
+                        <h3 id="quiz-progress-text" class="text-lg font-bold">問題 1 / 3</h3>
+                    </div>
+                    <div class="h-3 w-32 bg-slate-100 rounded-full overflow-hidden">
+                        <div id="quiz-progress-bar" class="h-full bg-emerald-500 transition-all duration-700 ease-out" style="width: 33%"></div>
+                    </div>
+                </div>
+                
+                <h3 id="quiz-question" class="text-2xl font-bold mb-10 leading-snug"></h3>
+                
+                <div id="quiz-options" class="space-y-4">
+                    <!-- Options generated by JS -->
+                </div>
+            </div>
+
+            <!-- Quiz Result -->
+            <div id="quiz-result" class="hidden bg-white rounded-3xl p-12 shadow-2xl border border-slate-100 text-center fade-in">
+                <div class="w-28 h-28 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
+                    <i data-lucide="award" class="w-16 h-16"></i>
+                </div>
+                <h2 id="result-title" class="text-4xl font-black mb-4 text-slate-800"></h2>
+                <p id="result-msg" class="text-slate-500 mb-8 text-lg"></p>
+                <div class="bg-slate-50 rounded-2xl p-6 mb-10 border border-slate-100 inline-block px-12">
+                   <p class="text-sm text-slate-400 uppercase font-bold tracking-widest mb-1">最終得分</p>
+                   <div id="result-score" class="text-6xl font-black text-emerald-600"></div>
+                </div>
+                <div>
+                  <button onclick="resetQuiz()" class="bg-emerald-600 text-white px-10 py-4 rounded-full font-bold text-lg hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-200 active:scale-95">
+                    重新挑戰
+                  </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="max-w-4xl mx-auto p-12 text-center border-t mt-12">
+        <div class="flex justify-center gap-6 mb-6">
+           <div class="w-10 h-1 bg-emerald-600 rounded-full"></div>
+           <div class="w-10 h-1 bg-orange-600 rounded-full"></div>
+           <div class="w-10 h-1 bg-blue-600 rounded-full"></div>
+        </div>
+        <p class="text-slate-400 text-sm font-medium">© 尖石國小文化數位導覽 | 傳承泰雅精神</p>
+        <p class="mt-2 text-slate-300 italic">Mhway su! 感謝你的參與</p>
+    </footer>
+
+    <script>
+        // --- DATA ---
+        const languageCards = [
+            { atayal: "Lokah su?", chinese: "你好嗎？", phonetic: "羅卡 蘇" },
+            { atayal: "Mhway su!", chinese: "謝謝你！", phonetic: "姆回 蘇" },
+            { atayal: "Gaga", chinese: "泰雅祖訓 / 社會規範", phonetic: "嘎嘎" },
+            { atayal: "Mrhuw", chinese: "頭目 / 領袖", phonetic: "姆魯" },
+        ];
+
+        const schoolPOIs = {
+            archery: { name: '傳統射箭場', desc: '這裡是孩子們練習泰雅傳統射箭的地方，培養專注力與耐力。' },
+            river: { name: '油羅溪畔', desc: '學校緊鄰清澈的油羅溪，是自然的生態教室。' },
+            wall: { name: '泰雅文化牆', desc: '校門口的大型彩繪記錄了泰雅族的遷徙歷史與傳說故事。' }
+        };
+
+        const quizQuestions = [
+            {
+                question: "尖石國小主要位於哪一個原住民族的傳統領域？",
+                options: ["阿美族", "泰雅族", "排灣族", "布農族"],
+                correct: 1
+            },
+            {
+                question: "尖石國小附近哪一條河流流經？",
+                options: ["淡水河", "大甲溪", "油羅溪", "濁水溪"],
+                correct: 2
+            },
+            {
+                question: "學校最知名的傳統技藝傳承之一是什麼？",
+                options: ["舞龍舞獅", "書法", "泰雅織布與射箭", "直排輪"],
+                correct: 2
+            }
+        ];
+
+        // --- STATE ---
+        let currentWordIndex = 0;
+        let isFlashcardFlipped = false;
+        let quizIndex = 0;
+        let score = 0;
+        let isAnswering = false;
+
+        // --- TAB SWITCHING ---
+        function showSection(id) {
+            document.querySelectorAll('.content-section').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`section-${id}`).classList.remove('hidden');
+            
+            // Update Tab UI
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('border-emerald-600', 'text-emerald-700', 'bg-emerald-50/50', 'font-bold');
+                btn.classList.add('border-transparent', 'text-slate-400');
+            });
+            const activeTab = document.getElementById(`tab-${id}`);
+            activeTab.classList.add('border-emerald-600', 'text-emerald-700', 'bg-emerald-50/50', 'font-bold');
+            activeTab.classList.remove('border-transparent', 'text-slate-400');
+
+            if (id === 'quiz') resetQuiz();
+            lucide.createIcons();
+        }
+
+        // --- POI LOGIC ---
+        function selectPOI(id) {
+            const detail = document.getElementById('poi-detail');
+            const title = document.getElementById('poi-title');
+            const desc = document.getElementById('poi-desc');
+            
+            // Highlight Button
+            document.querySelectorAll('.poi-btn').forEach(btn => btn.classList.remove('border-emerald-500', 'bg-emerald-50', 'scale-105'));
+            event.currentTarget.classList.add('border-emerald-500', 'bg-emerald-50', 'scale-105');
+
+            detail.classList.remove('hidden');
+            title.innerText = schoolPOIs[id].name;
+            desc.innerText = schoolPOIs[id].desc;
+        }
+
+        // --- FLASHCARD LOGIC ---
+        function toggleFlashcard() {
+            isFlashcardFlipped = !isFlashcardFlipped;
+            const inner = document.getElementById('flashcard-inner');
+            if (isFlashcardFlipped) inner.classList.add('rotate-y-180');
+            else inner.classList.remove('rotate-y-180');
+        }
+
+        function changeFlashcard(dir) {
+            isFlashcardFlipped = false;
+            document.getElementById('flashcard-inner').classList.remove('rotate-y-180');
+            
+            currentWordIndex = (currentWordIndex + dir + languageCards.length) % languageCards.length;
+            
+            setTimeout(() => {
+                document.getElementById('card-atayal').innerText = languageCards[currentWordIndex].atayal;
+                document.getElementById('card-chinese').innerText = languageCards[currentWordIndex].chinese;
+                document.getElementById('card-phonetic').innerText = "讀音：" + languageCards[currentWordIndex].phonetic;
+            }, 150);
+        }
+
+        // --- QUIZ LOGIC ---
+        function resetQuiz() {
+            quizIndex = 0;
+            score = 0;
+            isAnswering = false;
+            document.getElementById('quiz-container').classList.remove('hidden');
+            document.getElementById('quiz-result').classList.add('hidden');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = quizQuestions[quizIndex];
+            document.getElementById('quiz-progress-text').innerText = `問題 ${quizIndex + 1} / ${quizQuestions.length}`;
+            document.getElementById('quiz-progress-bar').style.width = `${((quizIndex + 1) / quizQuestions.length) * 100}%`;
+            document.getElementById('quiz-question').innerText = q.question;
+            
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+            
+            q.options.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.className = "group w-full p-5 text-left rounded-2xl border-2 border-slate-100 transition-all flex justify-between items-center hover:border-emerald-500 hover:bg-emerald-50";
+                btn.innerHTML = `<span class="font-semibold">${opt}</span><i data-lucide="arrow-right" class="text-slate-300"></i>`;
+                btn.onclick = () => handleAnswer(i, btn);
+                optionsContainer.appendChild(btn);
+            });
+            lucide.createIcons();
+        }
+
+        function handleAnswer(idx, btn) {
+            if (isAnswering) return;
+            isAnswering = true;
+            
+            const q = quizQuestions[quizIndex];
+            const isCorrect = idx === q.correct;
+            
+            if (isCorrect) {
+                score++;
+                btn.classList.add('border-green-500', 'bg-green-50', 'text-green-700');
+                btn.querySelector('i').setAttribute('data-lucide', 'check-circle-2');
+            } else {
+                btn.classList.add('border-red-500', 'bg-red-50', 'text-red-700');
+                btn.querySelector('i').setAttribute('data-lucide', 'alert-circle');
+            }
+            lucide.createIcons();
+
+            setTimeout(() => {
+                quizIndex++;
+                isAnswering = false;
+                if (quizIndex < quizQuestions.length) {
+                    loadQuestion();
+                } else {
+                    showQuizResult();
+                }
+            }, 1000);
+        }
+
+        function showQuizResult() {
+            document.getElementById('quiz-container').classList.add('hidden');
+            document.getElementById('quiz-result').classList.remove('hidden');
+            
+            const title = document.getElementById('result-title');
+            const msg = document.getElementById('result-msg');
+            
+            if (score === 3) {
+                title.innerText = "泰雅小智者";
+                msg.innerText = "完美的表現！你對尖石國小瞭若指掌。";
+            } else if (score >= 1) {
+                title.innerText = "文化探險家";
+                msg.innerText = "不錯的開始，繼續探索泰雅文化吧！";
+            } else {
+                title.innerText = "初級學習者";
+                msg.innerText = "別灰心，多逛逛導覽區再回來挑戰！";
+            }
+            
+            document.getElementById('result-score').innerHTML = `${score}<span class="text-2xl text-slate-400"> / ${quizQuestions.length}</span>`;
+        }
+
+        // --- INIT ---
+        window.onload = () => {
+            lucide.createIcons();
+            loadQuestion();
+        };
+    </script>
+</body>
+</html>
